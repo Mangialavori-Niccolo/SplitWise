@@ -1,0 +1,52 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+'--- Entità Principali ---
+class User {
+  - name: String
+}
+
+class Group {
+  - name: String
+}
+
+class Expense {
+  - description: String
+  - amount: double
+}
+
+'--- Classi Strategy ---
+interface DivisionStrategy {
+  + calcolaDebiti(spesa: Expense, gruppo: Group)
+}
+
+class EqualDivision {
+  + calcolaDebiti(spesa: Expense, gruppo: Group)
+}
+
+class PercentualDivision {
+  + calcolaDebiti(spesa: Expense, gruppo: Group)
+}
+
+
+'--- Relazioni Logiche ---
+' Un Utente può essere in molti Gruppi, e viceversa
+User "*" -- "*" Group : "membri"
+
+' Un Gruppo "possiede" (Composizione) molte Spese
+' Se il Gruppo muore, le Spese muoiono con lui.
+Group "1" *-- "*" Expense
+
+' Una Spesa è pagata da un solo Utente
+' (ma un Utente può pagare molte Spese)
+User "1" -- "*" Expense : "pagata da"
+
+' Una Spesa "usa" una sola Strategia di Divisione
+' (ma una Strategia può essere usata da molte Spese)
+Expense "*" -- "1" DivisionStrategy
+
+'--- Implementazione Strategy ---
+EqualDivision .up.|> DivisionStrategy
+PercentualDivision .up.|> DivisionStrategy
+
+@enduml

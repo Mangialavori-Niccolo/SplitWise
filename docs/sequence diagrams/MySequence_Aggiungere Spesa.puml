@@ -1,0 +1,80 @@
+@startuml
+' === Diagramma di Sequenza: Aggiungere Spesa (Versione Definitiva Pulita) ===
+
+' --- 1. Definizione Partecipanti Fissi ---
+actor "Utente" as U
+participant "SpesaController" as C
+participant "StrategyFactory" as F
+participant "SpesaService" as S
+participant "SpesaRepository" as R
+
+' --- 2. Inizio Flusso ---
+U -> C : addExpense(datiGrezzi)
+activate C
+
+' --- 3. Creazione Strategy ---
+C -> F : getStrategy(datiGrezzi.strategyType)
+activate F
+create participant "strategy: DivisionStrategy" as DS
+F -> DS : new ...()
+activate DS
+DS --> F
+F --> C : return strategy
+deactivate F
+
+' --- 4. Chiamata al Service ---
+C -> S : creaSpesa(dati, strategy)
+activate S
+
+' --- 5. Chiamata di Validazione ---
+S -> DS : validate(dati)
+activate DS
+DS --> S: return validation
+deactivate DS
+
+' --- 6. Blocco ALT: Gestione della Validazione ---
+alt [Validazione validation = true]
+    deactivate DS
+
+    ' --- 6.1 Creazione Expense ---
+    create entity "expense: Expense" as E
+    S -> E : new Expense(dati)
+    activate E
+    E --> S: return Expense
+    deactivate E
+
+    ' --- 6.2 Chiamata di Salvataggio ---
+    S -> R : save(expense)
+    activate R
+    R --> S: return save
+    deactivate R
+
+    ' --- 6.3 Blocco ALT annidato per il Salvataggio ---
+    alt [Salvataggio Save = true]
+        ' Percorso 1.1: Successo
+
+        S --> C : return true
+
+        C --> U : return "Spesa aggiunta!"
+
+    else [Salvataggio Save = false]
+        ' Percorso 1.2: Errore di Salvataggio
+
+        S --> C : return false
+
+        C --> U : return "Errore: Impossibile salvare!"
+    end
+
+else [Validazione validation = false]
+    ' Percorso 2: Errore di Validazione
+    deactivate DS
+
+    S --> C : return false
+    deactivate S
+
+
+    C --> U : return "Errore: Dati non validi!"
+    deactivate C
+end
+
+@enduml
