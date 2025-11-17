@@ -1,0 +1,41 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+' Impostazioni visive (per renderlo più leggibile)
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Utente" as User
+
+rectangle "SplitWise (Sistema)" {
+    '---Gestione Utenti e Gruppi---
+    (Creare Utente) as CREATE_USER
+    (Creare Gruppo) as CREATE_GROUP
+    (Aggiungere Membro a Gruppo) as ADD_MEMBER
+    (Cancellare Gruppo) as DELETE_GROUP
+    (Uscire da Gruppo) as LEAVE_GROUP
+
+    '---Gestione Spese e Bilancio---
+    (Aggiungere Spesa) as ADD_EXPENSE
+    (Rimuovere Spesa) as REMOVE_EXPENSE
+    (Visualizzare Bilancio Totale) as VIEW_BALANCE
+    (Saldare Debito) as SETTLE_DEBT
+
+    '---Relazioni "Extend" e "Include"---
+    ADD_EXPENSE ..> (Scegliere strategia di Divisione): <<include>>
+    VIEW_BALANCE ..> (Semplificare Debiti): <<include>>
+    LEAVE_GROUP .> (Controllare Bilangio Gruppo = 0): <<extend>>
+}
+
+'---Collegamenti con gli attori---
+User -- CREATE_USER
+User -- CREATE_GROUP
+User -- ADD_MEMBER
+User -- DELETE_GROUP
+User -- LEAVE_GROUP
+User -- ADD_EXPENSE
+User -- REMOVE_EXPENSE
+User -- VIEW_BALANCE
+User -- SETTLE_DEBT
+
+
+@enduml
