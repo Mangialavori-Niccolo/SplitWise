@@ -1,0 +1,61 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+title Algoritmo di Semplificazione dei Debiti
+
+'Il conrtoller chiama la funzione per calcolare i debiti del Service
+|Service|
+Start
+:Cerca chiede l'elenco delle spese che coinvolgono l'utente;
+
+|Repository|
+:Cerca le spese che coinvolgono l'utente richiesto;
+:Ritorna la lista al Service;
+->[List<Expense>];
+
+|Service|
+:Crea la mappa non semplificata vuota
+Map<User, Map<User, Double>>;
+while (Lista.hasNext()) is (true)
+    :Creo l'istanza della mappa
+    calcolando i debiti di ogni persona
+    (le persone le recupero da Group e
+    applico la strategia);
+    :Aggiungo l'istanza alla mappa;
+endwhile (false)
+
+:Crea Mappa<User, Double> saldiTotali
+(ogni volta che User appare come creditore,
+si somma l'importo; se appare come debitore,
+si sottrae);
+:Controlla che la somma dei saldi = 0;
+->Map<User, Double> saldiTotali;
+:Dividi gli utenti in due List<Map<User, Double>>
+creditori e debitori;
+:Crea la mappa semplificata Map<User, Map<User, Double>> mapSemplified;
+
+while (List debitori is not empty) is (true)
+    :Calcola debitore con asb(importo) massimo;
+    ->maxDeb;
+    :Calcola creditore con importo massimo;
+    ->maxCred;
+    :Calcola maxImp = min(abs(maxDeb.importo), maxCred.importo);
+    :maxDeb.saldo += maxImp
+    maxCred.saldo -= maxImp;
+    :Aggiungi il debito semplificato:
+    ""maxDeb deve (importo) a maxCred"
+    in mapSemplified;
+    if (maxDeb.importo == 0?) is (true) then
+        :Togli maxDeb dalla lista dei debitori;
+    endif
+    if (maxCred.importo == 0) is (true)then
+        :Togli maxCred dalla lista dei creditori;
+    else (false)
+    endif
+endwhile (false)
+
+:Return mapSemplified;
+
+stop
+
+@enduml

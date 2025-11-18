@@ -1,6 +1,7 @@
 @startuml
 'https://plantuml.com/use-case-diagram
 ' Impostazioni visive (per renderlo più leggibile)
+
 left to right direction
 skinparam packageStyle rectangle
 
