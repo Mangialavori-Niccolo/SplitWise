@@ -3,47 +3,66 @@
 
 '--- Entità Principali ---
 class User {
+  - id: final String
   - name: String
+  - email: String
 }
 
 class Group {
+  - id: final String
   - name: String
+  - description: String
 }
 
 class Expense {
+  - id: final String
+  - amount: Money
+  - payer: User
+  - involvedUsers: List<User>
+  - date: LocalDate
   - description: String
-  - amount: double
+  - group: Group
+
+  'Funzioni
+  + getGroup(): Optional<Group>
+}
+
+class Money{
+  - amount: BigDecimal
+  - currency: Currency - java.util.Currency -
 }
 
 '--- Classi Strategy ---
 interface DivisionStrategy {
-  + calcolaDebiti(spesa: Expense, gruppo: Group)
+  + calcolaDebiti(spesa: Expense)
 }
 
 class EqualDivision {
-  + calcolaDebiti(spesa: Expense, gruppo: Group)
+  + calcolaDebiti(spesa: Expense)
 }
 
 class PercentualDivision {
-  + calcolaDebiti(spesa: Expense, gruppo: Group)
+  + calcolaDebiti(spesa: Expense)
 }
 
 
 '--- Relazioni Logiche ---
-' Un Utente può essere in molti Gruppi, e viceversa
-User "*" -- "*" Group : "membri"
+' Un gruppo è formato da Utenti, gli utenti possono
+' non appartenere ad un gruppo
+Group "0..*" o--> "0..*" User: "Formato da"
 
-' Un Gruppo "possiede" (Composizione) molte Spese
-' Se il Gruppo muore, le Spese muoiono con lui.
-Group "1" *-- "*" Expense
+' Ogni spesa può essere legata a massimo 1 gruppo
+Group "0..1" <-right- "*" Expense: "Contiene"
 
 ' Una Spesa è pagata da un solo Utente
-' (ma un Utente può pagare molte Spese)
-User "1" -- "*" Expense : "pagata da"
+User "1" <-- "*" Expense : "Pagata da"
 
 ' Una Spesa "usa" una sola Strategia di Divisione
-' (ma una Strategia può essere usata da molte Spese)
-Expense "*" -- "1" DivisionStrategy
+' un solo Money
+' e coinvolge più utenti
+DivisionStrategy "1" <-left- "*" Expense
+Expense "*" *--> "1" Money
+Expense "*" --> "*" User: "Coinvolge"
 
 '--- Implementazione Strategy ---
 EqualDivision .up.|> DivisionStrategy

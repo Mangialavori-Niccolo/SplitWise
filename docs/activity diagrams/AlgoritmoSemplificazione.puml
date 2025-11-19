@@ -19,7 +19,7 @@ Map<User, Map<User, Double>>;
 while (Lista.hasNext()) is (true)
     :Creo l'istanza della mappa
     calcolando i debiti di ogni persona
-    (le persone le recupero da Group e
+    (le persone le recupero da involvedUsers e
     applico la strategia);
     :Aggiungo l'istanza alla mappa;
 endwhile (false)
