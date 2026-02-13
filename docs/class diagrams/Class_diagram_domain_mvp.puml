@@ -1,0 +1,83 @@
+@startuml
+skinparam linetype ortho
+
+'--- ENTITÀ CORE ---
+package "Core Entities" {
+    class User {
+      - id: final String
+      - name: String
+      - email: String
+    }
+
+    class Group {
+      - id: final String
+      - name: String
+    }
+
+    abstract class Transaction {
+      - id: String
+      - date: LocalDate
+      - amount: Money
+      - payer: User
+    }
+
+    class StandardExpense extends Transaction {
+      - involvedUsers: List<User>
+      - strategy: DivisionStrategy
+      + getDebts(): Map<User, Money>
+    }
+
+    class Payment extends Transaction {
+      - receiver: User
+    }
+
+    class Money {
+      - amount: BigDecimal
+      - currency: Currency
+    }
+}
+
+'--- DESIGN PATTERNS ---
+package "Patterns" {
+    interface DivisionStrategy {
+        + calculateDebts(expense: StandardExpense): Map<User, Money>
+    }
+    class EqualDivision implements DivisionStrategy
+    class PercentualDivision implements DivisionStrategy
+
+    class CurrencyConverter <<Singleton>> {
+        - {static} instance: CurrencyConverter
+        + {static} getInstance(): CurrencyConverter
+        + convert(m: Money, c: Currency): Money
+    }
+}
+
+'--- SERVIZI E PERSISTENZA ---
+package "Services & Persistence" {
+    interface ExpenseRepository {
+        + save(t: Transaction)
+        + findByGroup(g: Group): List<Transaction>
+    }
+
+    class BalanceService {
+        + calculateSimplifiedDebts(g: Group): List<Transaction>
+    }
+}
+
+'--- COLLEGAMENTI MANCANTI ---
+
+' Il Service usa il Repository per recuperare i dati e le Entità per i calcoli
+BalanceService ..> ExpenseRepository : "interroga"
+BalanceService ..> Transaction : "elabora"
+BalanceService ..> CurrencyConverter : "usa"
+
+' Relazioni strutturali
+Group "0..*" o--> "0..*" User
+Group "1" *--> "*" Transaction
+Transaction "*" o--> "1" User : "payer"
+Transaction "1" -left-> "1" Money
+Payment "*" -right-> "1" User : "receiver"
+StandardExpense "1" o--> "1" DivisionStrategy
+StandardExpense -up-> "*" User: "Coinvolti"
+
+@enduml

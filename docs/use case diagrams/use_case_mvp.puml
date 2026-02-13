@@ -9,22 +9,22 @@ actor "Utente" as User
 
 rectangle "SplitWise (Sistema)" {
     '---Gestione Utenti e Gruppi---
-    (Creare Utente) as CREATE_USER
-    (Creare Gruppo) as CREATE_GROUP
-    (Aggiungere Membro a Gruppo) as ADD_MEMBER
-    (Cancellare Gruppo) as DELETE_GROUP
-    (Uscire da Gruppo) as LEAVE_GROUP
+    (Registrazione Utente) as CREATE_USER
+    (Creazione Gruppo) as CREATE_GROUP
+    (Aggiunta/Rimozione Membro a Gruppo) as ADD_MEMBER
+    (Eliminazione Gruppo) as DELETE_GROUP
+    (Uscita da Gruppo) as LEAVE_GROUP
 
     '---Gestione Spese e Bilancio---
-    (Aggiungere Spesa) as ADD_EXPENSE
-    (Rimuovere Spesa) as REMOVE_EXPENSE
-    (Visualizzare Bilancio Totale) as VIEW_BALANCE
+    (Inserimento Spesa) as ADD_EXPENSE
+    (Rimozione Spesa) as REMOVE_EXPENSE
+    (Visualizzazione Bilancio Totale) as VIEW_BALANCE
     (Saldare Debito) as SETTLE_DEBT
 
     '---Relazioni "Extend" e "Include"---
-    ADD_EXPENSE ..> (Scegliere strategia di Divisione): <<include>>
-    VIEW_BALANCE ..> (Semplificare Debiti): <<include>>
-    LEAVE_GROUP .> (Controllare Bilangio Gruppo = 0): <<extend>>
+    ADD_EXPENSE ..> (Scelta strategia di Divisione): <<include>>
+    VIEW_BALANCE ..> (Semplificazione Debiti): <<include>>
+    LEAVE_GROUP .> (Controllo Bilancio dell'Utente nullo): <<include>>
 }
 
 '---Collegamenti con gli attori---
@@ -37,6 +37,5 @@ User -- ADD_EXPENSE
 User -- REMOVE_EXPENSE
 User -- VIEW_BALANCE
 User -- SETTLE_DEBT
-
 
 @enduml
